@@ -47,6 +47,37 @@ jobs:
         run: bundle exec jekyll build --baseurl "/LJT-Homepage"
         env:
           JEKYLL_ENV: production
+      - name: Verify generated content
+        run: |
+          set -euo pipefail
+          test -f _site/index.html
+          test -f _site/publications/index.html
+          grep -q "Personal Details" _site/index.html
+          grep -q "Academic Background" _site/index.html
+          grep -q "Research Experience" _site/index.html
+          grep -q "Skills and Research Expertise" _site/index.html
+          grep -q "Contact Information" _site/index.html
+          grep -q "SynLogic: Synthesizing Verifiable Reasoning Data at Scale" _site/index.html
+          grep -q "On the Perception Bottleneck of VLMs for Chart Understanding" _site/index.html
+          grep -q "On the Universal Truthfulness Hyperplane Inside LLMs" _site/index.html
+          grep -q "In-Context Sharpness as Alerts" _site/index.html
+          grep -q "C-Eval: A Multi-Level Multi-Discipline Chinese Evaluation Suite" _site/index.html
+          grep -q "Composing Parameter-Efficient Modules with Arithmetic Operations" _site/index.html
+          grep -q "jliugi@connect.ust.hk" _site/index.html
+          grep -q "tbK9jl4AAAAJ" _site/index.html
+          grep -q "junteng88716710" _site/index.html
+          grep -q "SynLogic" _site/publications/index.html
+          grep -q "Vision4Chart" _site/publications/index.html
+          grep -q "Universal_Truthfulness_Hyperplane" _site/publications/index.html
+          if grep -R -q "Paper Title Number" _site; then
+            echo "Demo publication content remains in generated site" >&2
+            exit 1
+          fi
+          if find _site -path '*/talks/*' -o -path '*/teaching/*' -o -path '*/portfolio/*' | grep -q .; then
+            echo "Unexpected sample collection output remains in generated site" >&2
+            exit 1
+          fi
+          find _site -maxdepth 2 -type f | sort | head -100
       - name: Configure GitHub Pages
         id: pages
         uses: actions/configure-pages@v6.0.0
